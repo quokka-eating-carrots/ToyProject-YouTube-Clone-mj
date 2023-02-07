@@ -1,34 +1,63 @@
-import { useState } from 'react'
-import reactLogo from './assets/react.svg'
-import './App.css'
+// // import "./App.css";
+import Header from "./components/Header/Header";
+import NavBar from "./components/NavBar";
+import { Outlet, useLocation } from "react-router-dom";
+import { useState } from "react";
+import SubNavBar from "./components/NavBar/subNavBar";
+import { useMediaQuery } from "react-responsive";
+import { ScrollRestoration } from "react-router-dom";
+import "./App.css";
 
 function App() {
-  const [count, setCount] = useState(0)
+  const [display, setDisplay] = useState(true);
+  const location = useLocation();
+
+  let pathName = location.pathname.substring(1, 7);
+
+  function navDisplay(display) {
+    setDisplay(display);
+  }
+
+  const isPc = useMediaQuery({
+    query: "(min-width:1024px)",
+  });
+
+  const isTablet = useMediaQuery({
+    query: "(max-width:1023px)",
+  });
+
+  function displayClass() {
+    if (isPc) {
+      return display ? "big" : "small";
+    } else {
+      return display ? "small" : "big";
+    }
+  }
+
+  function displayNav() {
+    if (isPc) {
+      return display ? <NavBar /> : <SubNavBar />;
+    } else {
+      return display ? <SubNavBar /> : <NavBar />;
+    }
+  }
 
   return (
     <div className="App">
-      <div>
-        <a href="https://vitejs.dev" target="_blank">
-          <img src="/vite.svg" className="logo" alt="Vite logo" />
-        </a>
-        <a href="https://reactjs.org" target="_blank">
-          <img src={reactLogo} className="logo react" alt="React logo" />
-        </a>
-      </div>
-      <h1>Vite + React</h1>
-      <div className="card">
-        <button onClick={() => setCount((count) => count + 1)}>
-          count is {count}
-        </button>
-        <p>
-          Edit <code>src/App.jsx</code> and save to test HMR
-        </p>
-      </div>
-      <p className="read-the-docs">
-        Click on the Vite and React logos to learn more
-      </p>
+      <ScrollRestoration />
+      <Header navDisplay={navDisplay} display={display} />
+      {pathName === "detail" ? (
+        <aside className={display ? "big" : "small"}>
+          {display ? <NavBar /> : <SubNavBar />}
+        </aside>
+      ) : (
+        <aside className={displayClass()}>{displayNav()}</aside>
+      )}
+      <main>
+        <Outlet context={{ navDisplay }} />
+      </main>
     </div>
-  )
+  );
 }
 
-export default App
+export default App;
